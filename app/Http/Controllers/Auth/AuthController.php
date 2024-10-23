@@ -16,4 +16,30 @@ class AuthController extends Controller
     {
         return view('auth.login');
     }
+    public function postLogin(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required'
+        ]);
+        $credentials = $request->only('email', 'password');
+        if (Auth::attempt($credentials)) {
+            return redirect()->intended('dashbord')
+                ->withSuccess('you are successfully login');
+        }
+
+        return redirect("login")->withError('Oppes! You have entered invalid credentials');
+    }
+    public function dashbord()
+    {
+        if (Auth::check()) {
+            return view('dashbord');
+        }
+        return redirect("login")->withSuccess('opps! do not have access');
+    }
+    public function logout()
+    {
+        Auth::logout();
+        return redirect('login');
+    }
 }
